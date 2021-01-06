@@ -5,6 +5,8 @@
 #include <QDir>
 #include <QFile>
 #include <QDebug>
+#include <thread>
+
 extern "C"{
 #include "libavformat/avformat.h"
 #include "libavutil/avutil.h"
@@ -21,6 +23,11 @@ using namespace std;
 static double r2d(AVRational r) {
 
     return r.den == 0 ?0:double(r.num)/(double)r.den;
+}
+
+void XSleep(int ms) {
+    chrono::milliseconds du(ms);
+    this_thread::sleep_for(du);
 }
 
 //测试解封装
@@ -100,11 +107,38 @@ int main(int argc, char *argv[])
     videoStreamID = av_find_best_stream(ic,AVMEDIA_TYPE_VIDEO,-1,-1,nullptr,0);
     //ic->streams[videoStreamID];
 
+    // malloc AVPaket 并初始化
+    AVPacket* pkt = av_packet_alloc();
+    for(;;) {
+        int re =av_read_frame(ic,pkt);
+        if(re != 0) {
+            //读取失败
+            int ms = 3000; //3秒位置，根据时间基数(分数)转化
+            long long pos = (double)ms / r2d(ic->streams[pkt->stream_index]->time_base);
+            av_seek_frame(ic,videoStreamID,pos,AVSEEK_FLAG_BACKWARD | AVSEEK_FLAG_FRAME);
+            continue;
+        }
+
+        qDebug()<<"pkg size is "<<pkt->size;
+        qDebug()<<"pkg pts is "<<pkt->pts;
+        // 转化为毫秒，方便做时间同步
+        qDebug()<<"pkt->pts ms is" <<pkt->pts* (r2d(ic->streams[pkt->stream_index]->time_base) * 1000);
+
+        qDebug()<<"pkg dts is "<<pkt->dts;
+        if(pkt->stream_index == videoStreamID) {
+            qDebug()<<"视频信息";
+        }
+        if(pkt->stream_index == audioStreamID) {
+            qDebug()<<"音频信息";
+        }
+        //引用计数减一
+        av_packet_unref(pkt);
+        XSleep(500);
+    }
     if(ic) {
         // 释放封装上下文，并且将ic 置0
         avformat_close_input(&ic);
     }
 
-    cout<<"open "<<path<<"sucess"<<endl;
     return a.exec();
 }

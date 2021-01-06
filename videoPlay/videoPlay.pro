@@ -41,6 +41,11 @@ FORMS += \
     mainwindow.ui
 
 
+DESTDIR = ../bin
+MOC_DIR = ../tmp/
+RCC_DIR = ../tmp/
+UI_DIR = ../tmp/
+
 PKGCONFIG += libavcodec libavutil libavformat libavdevice\
  libavresample libswresample  libavfilter libswscale
 
