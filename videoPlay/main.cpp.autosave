@@ -151,7 +151,7 @@ int main(int argc, char *argv[])
 
     }
 
-    qDebug()<<"finde AVCodec" <<ic->streams[videoStreamID]->codecpar->codec_id;
+    qDebug()<<"finde audio" <<ic->streams[videoStreamID]->codecpar->codec_id;
     // 创建解码器上下文
     AVCodecContext *vc =  avcodec_alloc_context3(vcodec);
     // 配置解码器上下文参数
