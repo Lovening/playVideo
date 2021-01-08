@@ -46,8 +46,8 @@ int main(int argc, char *argv[])
     path+="/../../../"+name;
     //初始化网络库 (rtsp rtmp http 协议流媒体)
     avformat_network_init();
-    // 注册解码器
-    avcodec_register_all();
+    // 注册解码器  注册解码器函数已经弃用
+    // avcodec_register_all();
 
 
 
@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
     //设置rtsp流用tcp打开
     av_dict_set(&opts,"rtsp_transport","tcp",0);
     av_dict_set(&opts,"max_delay","500",0);
-    //上下文信息
+    // 创建流 上下文信息
     AVFormatContext *ic = NULL;
     int re = avformat_open_input(&ic,
                         path.c_str(),
@@ -151,7 +151,7 @@ int main(int argc, char *argv[])
 
     }
 
-    qDebug()<<"finde AVCodec" <<ic->streams[videoStreamID]->codecpar->codec_id;
+    qDebug()<<"finde audio" <<ic->streams[videoStreamID]->codecpar->codec_id;
     // 创建解码器上下文
     AVCodecContext *vc =  avcodec_alloc_context3(vcodec);
     // 配置解码器上下文参数

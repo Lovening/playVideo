@@ -37,7 +37,7 @@ MOVE          = mv -f
 TAR           = tar -cf
 COMPRESS      = gzip -9f
 DISTNAME      = videoPlay1.0.0
-DISTDIR = /Users/ning/WorkSpace/ffmpeg/videoPlay/.tmp/videoPlay1.0.0
+DISTDIR = /Users/ning/WorkSpace/ffmpeg/tmp/videoPlay1.0.0
 LINK          = /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++
 LFLAGS        = -stdlib=libc++ -headerpad_max_install_names $(EXPORT_ARCH_ARGS) -Wl,-syslibroot,/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.1.sdk -mmacosx-version-min=10.13 -Wl,-rpath,@executable_path/../Frameworks -Wl,-rpath,/Users/ning/Qt5.14.2/5.14.2/clang_64/lib
 LIBS          = $(SUBLIBS) -F/Users/ning/Qt5.14.2/5.14.2/clang_64/lib -L/usr/local/Cellar/ffmpeg/4.3.1_4/lib -lavcodec -lavutil -lavformat -lavdevice -lavresample -lswresample -lavfilter -lswscale -framework QtWidgets -framework QtGui -framework AppKit -framework Metal -framework QtCore -framework DiskArbitration -framework IOKit -framework OpenGL -framework AGL   
@@ -48,17 +48,17 @@ STRIP         = strip
 
 ####### Output directory
 
-OBJECTS_DIR   = ./
+OBJECTS_DIR   = ../tmp/
 
 ####### Files
 
 SOURCES       = main.cpp \
 		mainwindow.cpp \
 		video.cpp ../tmp/moc_mainwindow.cpp
-OBJECTS       = main.o \
-		mainwindow.o \
-		video.o \
-		moc_mainwindow.o
+OBJECTS       = ../tmp/main.o \
+		../tmp/mainwindow.o \
+		../tmp/video.o \
+		../tmp/moc_mainwindow.o
 DIST          = ../../../Qt5.14.2/5.14.2/clang_64/mkspecs/features/spec_pre.prf \
 		../../../Qt5.14.2/5.14.2/clang_64/mkspecs/qdevice.pri \
 		../../../Qt5.14.2/5.14.2/clang_64/mkspecs/features/device_config.prf \
@@ -770,7 +770,7 @@ compiler_clean: compiler_moc_predefs_clean compiler_moc_header_clean compiler_ui
 
 ####### Compile
 
-main.o: main.cpp mainwindow.h \
+../tmp/main.o: main.cpp mainwindow.h \
 		../../../Qt5.14.2/5.14.2/clang_64/lib/QtWidgets.framework/Headers/QMainWindow \
 		../../../Qt5.14.2/5.14.2/clang_64/lib/QtWidgets.framework/Headers/qmainwindow.h \
 		../../../Qt5.14.2/5.14.2/clang_64/lib/QtWidgets.framework/Headers/QApplication \
@@ -812,19 +812,19 @@ main.o: main.cpp mainwindow.h \
 		/usr/local/Cellar/ffmpeg/4.3.1_4/include/libavcodec/codec_desc.h \
 		/usr/local/Cellar/ffmpeg/4.3.1_4/include/libavformat/avio.h \
 		/usr/local/Cellar/ffmpeg/4.3.1_4/include/libavformat/version.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o main.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o ../tmp/main.o main.cpp
 
-mainwindow.o: mainwindow.cpp mainwindow.h \
+../tmp/mainwindow.o: mainwindow.cpp mainwindow.h \
 		../../../Qt5.14.2/5.14.2/clang_64/lib/QtWidgets.framework/Headers/QMainWindow \
 		../../../Qt5.14.2/5.14.2/clang_64/lib/QtWidgets.framework/Headers/qmainwindow.h \
 		../tmp/ui_mainwindow.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o mainwindow.o mainwindow.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o ../tmp/mainwindow.o mainwindow.cpp
 
-video.o: video.cpp video.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o video.o video.cpp
+../tmp/video.o: video.cpp video.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o ../tmp/video.o video.cpp
 
-moc_mainwindow.o: ../tmp/moc_mainwindow.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_mainwindow.o ../tmp/moc_mainwindow.cpp
+../tmp/moc_mainwindow.o: ../tmp/moc_mainwindow.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o ../tmp/moc_mainwindow.o ../tmp/moc_mainwindow.cpp
 
 ####### Install
 
