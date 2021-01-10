@@ -11,6 +11,7 @@ extern "C"{
 #include "libavformat/avformat.h"
 #include "libavutil/avutil.h"
 #include "libavcodec/avcodec.h"
+#include "libswscale/swscale.h"
 }
 //int main(int argc, char *argv[])
 //{
@@ -170,6 +171,14 @@ int main(int argc, char *argv[])
     qDebug()<<"video avcodec_open2 sucessful";
     // malloc AVPaket 并初始化
     AVPacket* pkt = av_packet_alloc();
+
+    AVFrame * frame = av_frame_alloc();
+
+    // 像素格式和尺寸转化的上下文
+    SwsContext* vctx = nullptr;
+    // 图像格式转化输出的数据
+    unsigned char * rgb = nullptr;
+
     for(;;) {
         int re =av_read_frame(ic,pkt);
         if(re != 0) {
@@ -186,16 +195,77 @@ int main(int argc, char *argv[])
         qDebug()<<"pkt->pts ms is" <<pkt->pts* (r2d(ic->streams[pkt->stream_index]->time_base) * 1000);
 
         qDebug()<<"pkg dts is "<<pkt->dts;
-        if(pkt->stream_index == videoStreamID) {
+        AVCodecContext* cc = 0
+;        if(pkt->stream_index == videoStreamID) {
             qDebug()<<"视频信息";
+            cc = vc;
+
         }
         if(pkt->stream_index == audioStreamID) {
             qDebug()<<"音频信息";
+            cc = ac;
         }
+
+        //解码视频
+        // 发送packet 到解码线程 不占用cpu,send 传null ,调用多次receive 取出所有缓冲帧
+        re = avcodec_send_packet(cc,pkt);
         //引用计数减一
         av_packet_unref(pkt);
+        if(re != 0) {
+            char buf[1024] = {0};
+            av_strerror(re,buf,sizeof (buf));
+            cout<<"avcodec_send_packet faild " <<path<<"faild"<<buf<<endl;
+            continue;
+        }
+
+        for(;;) {
+        // 不占用cpu  从线程中获取数据 ,一次send 可能对应多次receive
+            re = avcodec_receive_frame(cc,frame);
+            if(re != 0 )
+                break;
+            qDebug()<<"recv frame " <<frame->format <<" "<<frame->linesize[0];
+
+            if(cc = vc ) {
+                // 图像转化
+                vctx = sws_getCachedContext(
+                            vctx,// 传null 会新创建
+                            frame->width,frame->height,
+                            (AVPixelFormat)frame->format,// 输入的宽高,比如格式 YUV420P
+                            frame->width,frame->height, // 输出的
+                            AV_PIX_FMT_RGBA,
+                            SWS_BILINEAR,// 尺寸变化指定的算法
+                            0,0,0
+                            );
+                if(vctx){
+
+                    if(!rgb) rgb = new unsigned char[frame->width*frame->height*4];
+                    uint8_t *data[2] ={0};
+                    data[0] = rgb;
+                    int lines[2] = {0};
+                    lines[0] = frame->width*4 ; // 一行的字节数
+                    qDebug()<<"像素格式转化上下文 创建或者获取成功";
+                    re = sws_scale(
+                           vctx,
+                           frame->data,// 输入数据
+                           frame->linesize, // 输入行大小
+                            0, // 切片开始的位置
+                            frame->height, // 输入高度
+                            data ,// 输出的数据
+                            lines
+                     ); // 这一步的开销非常大
+                    qDebug()<<"sws_scale " <<re;
+                }
+                else
+                    qDebug()<<"像素格式转化上下文 创建或者获取失败";
+            }
+
+        }
+
+
         XSleep(500);
     }
+    av_frame_free(&frame);
+
     if(ic) {
         // 释放封装上下文，并且将ic 置0
         avformat_close_input(&ic);
