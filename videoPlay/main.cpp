@@ -11,7 +11,8 @@ extern "C"{
 #include "libavformat/avformat.h"
 #include "libavutil/avutil.h"
 #include "libavcodec/avcodec.h"
-#include "libswscale/swscale.h"
+#include "libswscale/swscale.h"  // 图像转化
+#include "libswresample/swresample.h" // 音频转化
 }
 //int main(int argc, char *argv[])
 //{
@@ -179,6 +180,26 @@ int main(int argc, char *argv[])
     // 图像格式转化输出的数据
     unsigned char * rgb = nullptr;
 
+    // 音频重采样率
+    SwrContext* actx = swr_alloc();
+    actx = swr_alloc_set_opts(actx,
+                              av_get_default_channel_layout(2), //输出格式
+                              AV_SAMPLE_FMT_S16,// 输出样本格式
+                              ac->sample_fmt, //采样率 一秒钟的样本数量
+                              av_get_default_channel_layout(ac->channels), //输入的格式
+                              ac->sample_fmt,
+                              ac->sample_rate,
+                              0,0
+                              );
+    re = swr_init(actx);
+    if(re != 0) {
+        char buf[1024] = {0};
+        av_strerror(re,buf,sizeof (buf));
+        cout<<"swr_init faild " <<path<<"faild"<<buf<<endl;
+        return  -1;
+    }
+    unsigned char * pcm = nullptr;
+
     for(;;) {
         int re =av_read_frame(ic,pkt);
         if(re != 0) {
@@ -257,6 +278,13 @@ int main(int argc, char *argv[])
                 }
                 else
                     qDebug()<<"像素格式转化上下文 创建或者获取失败";
+            } else { // 音频重采样
+                uint8_t *data[2] ={0};
+                if(pcm) pcm = new uint8_t[frame->nb_samples*2*2];
+                data[0] = pcm;
+                re = swr_convert(actx,data,frame->nb_samples, // 输出
+                            (const u_int8_t**)frame->data,frame->nb_samples //输入
+                            );
             }
 
         }
