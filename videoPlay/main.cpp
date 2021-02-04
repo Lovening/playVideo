@@ -14,6 +14,7 @@ extern "C"{
 #include "libswscale/swscale.h"  // 图像转化
 #include "libswresample/swresample.h" // 音频转化
 }
+
 //int main(int argc, char *argv[])
 //{
 //    QApplication a(argc, argv);
@@ -37,8 +38,9 @@ void XSleep(int ms) {
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-//    MainWindow w;
-//    w.show();
+    MainWindow w;
+    w.show();
+#if 0
     // 初始化封装库
     // av_register_all();
     string name = "11.mp4";
@@ -298,6 +300,6 @@ int main(int argc, char *argv[])
         // 释放封装上下文，并且将ic 置0
         avformat_close_input(&ic);
     }
-
+#endif
     return a.exec();
 }

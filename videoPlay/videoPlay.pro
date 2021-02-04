@@ -1,4 +1,4 @@
-QT       += core gui
+QT       += core gui opengl
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -31,11 +31,13 @@ INCLUDEPATH +=$$LIB_DIR/include
 SOURCES += \
     main.cpp \
     mainwindow.cpp \
-    video.cpp
+    video.cpp \
+    xvideowidget.cpp
 
 HEADERS += \
     mainwindow.h \
-    video.h
+    video.h \
+    xvideowidget.h
 
 FORMS += \
     mainwindow.ui
