@@ -24,9 +24,9 @@ CONFIG+=sdk_no_version_check
 #error: linker command failed with exit code 1 (use -v to see invocation)
 
 #那主要的原因还是库没有链接完整，第一个检查ffmpeg用到的库链接到了没有，如上面不能只写libavcodec.a，少了libavutil.a就有这样的问题。
-LIB_DIR=/usr/local/Cellar/ffmpeg/4.3.1_1/
-message("lib_dir is $$LIB_DIR")
-INCLUDEPATH +=$$LIB_DIR/include
+#LIB_DIR=/usr/local/Cellar/ffmpeg/4.3.1_1/
+#message("lib_dir is $$LIB_DIR")
+INCLUDEPATH +=/usr/local/include
 
 SOURCES += \
     main.cpp \
@@ -49,8 +49,16 @@ RCC_DIR = ../tmp/
 UI_DIR = ../tmp/
 OBJECTS_DIR = ../tmp/
 
-PKGCONFIG += libavcodec libavutil libavformat libavdevice\
- libavresample libswresample  libavfilter libswscale
+#PKGCONFIG += libavcodec libavutil libavformat libavdevice\
+# libavresample libswresample  libavfilter libswscale
+LIBS+=/usr/local/lib/libavcodec.dylib \
+      /usr/local/lib/libavutil.dylib \
+      /usr/local/lib/libavformat.dylib \
+      /usr/local/lib/libavdevice.dylib \
+      /usr/local/lib/libavresample.dylib \
+      /usr/local/lib/libswresample.dylib \
+      /usr/local/lib/libavfilter.dylib \
+      /usr/local/lib/libswscale.dylib
 
 #LIBS += "$$LIB_DIR/lib/libavcodec.a" \
 #        "$$LIB_DIR/lib/libavutil.a" \

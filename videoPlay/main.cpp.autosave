@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     MainWindow w;
     w.show();
-#if 1
+#if 0
     // 初始化封装库
     // av_register_all();
     string name = "11.mp4";
